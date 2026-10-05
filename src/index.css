@@ -1,0 +1,9 @@
+/* MoneyTrack global styles */
+body {
+  min-height: 100vh;
+}
+
+/* Lets flex children shrink so long text wraps instead of overflowing */
+.min-w-0 {
+  min-width: 0;
+}
