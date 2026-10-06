@@ -22,7 +22,7 @@ class ErrorBoundary extends Component {
           <p className="text-muted">
             An unexpected error happened. Your saved data is safe.
           </p>
-          <a href="/" className="btn btn-success">
+          <a href={import.meta.env.BASE_URL} className="btn btn-success">
             <i className="bi bi-house me-1"></i>
             Reload MoneyTrack
           </a>

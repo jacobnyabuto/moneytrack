@@ -13,7 +13,7 @@ import TransactionProvider from './context/TransactionProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <TransactionProvider>
         <App />
       </TransactionProvider>
