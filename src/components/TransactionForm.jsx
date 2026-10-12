@@ -6,17 +6,20 @@ import { getToday } from '../utils/dateHelpers'
 function TransactionForm({
   onSave,
   initialData,
+  prefill,
   heading = 'Add Transaction',
   submitLabel = 'Add Transaction',
   onCancel,
 }) {
+  // initialData means "we are editing". prefill only supplies starting values for a NEW transaction.
   const isEditing = Boolean(initialData)
+  const start = initialData ?? prefill
 
-  const [title, setTitle] = useState(initialData?.title ?? '')
-  const [amount, setAmount] = useState(initialData ? String(initialData.amount) : '')
-  const [type, setType] = useState(initialData?.type ?? 'expense')
-  const [category, setCategory] = useState(initialData?.category ?? 'Food')
-  const [date, setDate] = useState(initialData?.date ?? getToday())
+  const [title, setTitle] = useState(start?.title ?? '')
+  const [amount, setAmount] = useState(start ? String(start.amount) : '')
+  const [type, setType] = useState(start?.type ?? 'expense')
+  const [category, setCategory] = useState(start?.category ?? 'Food')
+  const [date, setDate] = useState(start?.date ?? getToday())
   const [errors, setErrors] = useState({})
 
   const categoryOptions = type === 'income' ? incomeCategories : expenseCategories

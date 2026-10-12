@@ -1,6 +1,7 @@
 import SummaryCard from '../components/SummaryCard'
 import MonthPicker from '../components/MonthPicker'
 import CategoryChart from '../components/CategoryChart'
+import AiSummary from '../components/AiSummary'
 import EmptyState from '../components/EmptyState'
 import useTransactions from '../hooks/useTransactions'
 import useMonthFilter from '../hooks/useMonthFilter'
@@ -9,12 +10,15 @@ import { calculateTotals, getExpensesByCategory } from '../utils/calculations'
 import { formatCurrency } from '../utils/formatters'
 
 function ReportsPage() {
-  const { transactions } = useTransactions()
+  const { transactions, budget } = useTransactions()
   const { months, activeMonth, setSelectedMonth, monthTransactions, periodLabel } =
     useMonthFilter(transactions)
 
   const { income, expenses, balance } = calculateTotals(monthTransactions)
   const categoryData = getExpensesByCategory(monthTransactions)
+
+  // A budget only makes sense for one month, so "All time" sends 0 (no budget)
+  const budgetForSummary = activeMonth === 'all' ? 0 : budget
 
   return (
     <>
@@ -49,54 +53,67 @@ function ReportsPage() {
           message="There are no expenses for this period."
         />
       ) : (
-        <div className="row g-3">
-          <div className="col-12 col-lg-6">
-            <div className="card shadow-sm h-100">
-              <div className="card-body">
-                <div style={{ maxWidth: '380px' }} className="mx-auto">
-                  <CategoryChart data={categoryData} />
+        <>
+          <div className="row g-3">
+            <div className="col-12 col-lg-6">
+              <div className="card shadow-sm h-100">
+                <div className="card-body">
+                  <div style={{ maxWidth: '380px' }} className="mx-auto">
+                    <CategoryChart data={categoryData} />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-12 col-lg-6">
+              <div className="card shadow-sm h-100">
+                <div className="table-responsive">
+                  <table className="table align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Category</th>
+                        <th className="text-end">Amount</th>
+                        <th className="text-end">Share</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {categoryData.map((item, index) => (
+                        <tr key={item.category}>
+                          <td>
+                            <span
+                              className="d-inline-block rounded-circle me-2"
+                              style={{
+                                width: '12px',
+                                height: '12px',
+                                backgroundColor: CHART_COLORS[index % CHART_COLORS.length],
+                              }}
+                            ></span>
+                            {item.category}
+                          </td>
+                          <td className="text-end">{formatCurrency(item.total)}</td>
+                          <td className="text-end">
+                            {((item.total / expenses) * 100).toFixed(1)}%
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="col-12 col-lg-6">
-            <div className="card shadow-sm h-100">
-              <div className="table-responsive">
-                <table className="table align-middle mb-0">
-                  <thead>
-                    <tr>
-                      <th>Category</th>
-                      <th className="text-end">Amount</th>
-                      <th className="text-end">Share</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {categoryData.map((item, index) => (
-                      <tr key={item.category}>
-                        <td>
-                          <span
-                            className="d-inline-block rounded-circle me-2"
-                            style={{
-                              width: '12px',
-                              height: '12px',
-                              backgroundColor: CHART_COLORS[index % CHART_COLORS.length],
-                            }}
-                          ></span>
-                          {item.category}
-                        </td>
-                        <td className="text-end">{formatCurrency(item.total)}</td>
-                        <td className="text-end">
-                          {((item.total / expenses) * 100).toFixed(1)}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div className="mt-4">
+            <AiSummary
+              key={`${activeMonth}-${income}-${expenses}-${budgetForSummary}`}
+              periodLabel={periodLabel}
+              income={income}
+              expenses={expenses}
+              budget={budgetForSummary}
+              categories={categoryData}
+            />
           </div>
-        </div>
+        </>
       )}
     </>
   )
