@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+  "node": ">=20"
+},
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js"
